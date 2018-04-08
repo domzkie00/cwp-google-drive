@@ -18,7 +18,13 @@
 	<h1>Google Drive</h1>
 	<span><b>ROOT:</b> /<?= $folder_name ?></span>
 	<a href="javascript:;" style="float: right; text-decoration: none;" class="upload-file">Upload File</a>
-	<input name="file_1" type="file" id="select-file-upload" hidden>
+
+	<form action="" method="post" id="googledrive_upfile_form" enctype="multipart/form-data">
+	    <input type="hidden" name="path" value="<?= $root_folder ?>">
+	    <input type="hidden" name="action" value="googledrive_upload_file" />
+	    <input type="file" name="upload_file" id="select-file-upload" hidden>
+	</form>
+
     <thead>
         <tr>
             <th style="text-align: center;">Name</th>

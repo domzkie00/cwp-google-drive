@@ -14,24 +14,10 @@ jQuery(function($){
 		});
 
 		$(document).on('change', '#select-file-upload', function(){
-			var file = $(this).get(0).files[0];
-			var path = $(this).val();
-			console.log(file);
-
-			$.post(
-                cwpg_wp_script.ajaxurl,
-                { 
-            	data: { 
-	              'path' : path,
-	            },
-                action : 'upload_file'
-                }, 
-                function( result, textStatus, xhr ) {
-                    console.log(result);
-                }).fail(function(error) {
-                    console.log(error);
-                }
-            );
+			$('.upload-file').text('Uploading...');
+			$('.upload-file').css({'pointer-events': 'none', 'box-shadow': 'none'});
+			$('.upload-file').blur();
+			$('#googledrive_upfile_form').submit();
 		});
 
 		$(document).on('click', '.db-trash', function(){

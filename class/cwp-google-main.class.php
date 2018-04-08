@@ -21,7 +21,7 @@ class Clients_WP_Google{
         add_action('wp_ajax_get_folder_list', array($this, 'get_folder_list_ajax'));
         add_filter('the_content', array($this, 'folder_content_table'), 6);
         add_action('wp_ajax_delete_file', array($this, 'delete_file_ajax'));
-        add_action('wp_ajax_upload_file', array($this, 'upload_file_ajax'));
+        add_action('init', array($this, 'upload_file'));
     }
 
     public function cwp_google_add_admin_scripts() {
@@ -224,37 +224,39 @@ class Clients_WP_Google{
         }
     }
 
-    public function upload_file_ajax() {
-        try {
-            echo $_POST['data']['path'];
-            /*$client = $this->google_client();
-            $file = new Google_Service_Drive_DriveFile();
-            $file->setTitle($title);
-            $file->setDescription($description);
-            $file->setMimeType($mimeType);
+    public function upload_file() {
+        if(isset($_POST['action'])) {
+            if($_POST['action'] == 'googledrive_upload_file') {
+                $filename = $_FILES["upload_file"]["name"];
+                $filepath = realpath($_FILES["upload_file"]["tmp_name"]);
+                $mimeType = $_FILES["upload_file"]["type"];
+                $cwpgoogle_settings_options = get_option('cwpgoogle_settings_options');
+                $app_key    = isset($cwpgoogle_settings_options['app_key']) ? $cwpgoogle_settings_options['app_key'] : '';
+                $app_secret = isset($cwpgoogle_settings_options['app_secret']) ? $cwpgoogle_settings_options['app_secret'] : '';
+                $app_token  = isset($cwpgoogle_settings_options['app_token']) ? $cwpgoogle_settings_options['app_token'] : '';
 
-            if ($parentId != null) {
-                $parent = new Google_Service_Drive_ParentReference();
-                $parent->setId($parentId);
-                $file->setParents(array($parent));
+                if(!empty($app_key) && !empty($app_secret)) {
+                    $client = $this->google_client();
+                    $service = new Google_Service_Drive($client);
+
+                    $file = new Google_Service_Drive_DriveFile();
+                    $file->setName($filename);
+                    $file->setMimeType($mimeType);
+                    $file->setParents(array($_POST['path']));
+
+                    try {
+                        $data = file_get_contents($filepath);
+
+                        $createdFile = $service->files->create($file, array(
+                            'data' => $data,
+                            'mimeType' => $mimeType,
+                        ));
+                    } catch (Exception $e) {
+                        print "An error occurred: " . $e->getMessage();
+                    }
+                }
             }
-
-            try {
-                $data = file_get_contents($filename);
-
-                $createdFile = $service->files->insert($file, array(
-                    'data' => $data,
-                    'mimeType' => $mimeType,
-                ));
-
-                echo "File uploaded.";
-            } catch (Exception $e) {
-                print "An error occurred: " . $e->getMessage();
-            }*/
-        } catch (Exception $e) {
-            print_r("An error occurred: " . $e->getMessage());
         }
-        die();
     }
 
     public function delete_file_ajax() {
