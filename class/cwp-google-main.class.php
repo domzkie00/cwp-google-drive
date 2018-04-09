@@ -19,7 +19,7 @@ class Clients_WP_Google{
         add_action('admin_enqueue_scripts', array( $this, 'cwp_google_add_admin_scripts' ));
         add_action('wp_enqueue_scripts', array($this, 'cwp_google_add_wp_scripts'), 20, 1);
         add_action('wp_ajax_get_folder_list', array($this, 'get_folder_list_ajax'));
-        add_filter('the_content', array($this, 'folder_content_table'), 6);
+        add_filter('the_content', array($this, 'folder_content_table'));
         add_action('wp_ajax_delete_file', array($this, 'delete_file_ajax'));
         add_action('init', array($this, 'upload_file'));
     }
@@ -161,6 +161,7 @@ class Clients_WP_Google{
         global $pages;
 
         foreach($pages as $page) {
+            $page_content = nl2br($page);
             if (strpos($page, '[cwp_') !== FALSE) {
                 $args = array(
                     'meta_key' => '_clients_page_shortcode',
@@ -214,13 +215,15 @@ class Clients_WP_Google{
                                 }
                             }
 
-
+                            ob_start();
                             include_once(CWPG_PATH_INCLUDES . '/cwp-google-table.php');
-                            
+                            $page_content .= ob_get_clean();
                         }
                     }
                 }
             }
+
+            return $page_content;
         }
     }
 
