@@ -1,5 +1,5 @@
 <div class="wrap" id="clients-wp-merge-wrap">
-    <h1>Ninja 2 PDF - Google Drive</h1>
+    <h1>Clients WP - Google Drive</h1>
     <br />
     <?php settings_errors() ?>
     <div class="content-wrap">

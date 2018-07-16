@@ -161,7 +161,14 @@ class Clients_WP_Google{
         global $pages;
 
         foreach($pages as $page) {
-            $page_content = nl2br($page);
+            if (strpos($page, '[clientswp_user_register_form]') !== FALSE) {
+                return nl2br($page);
+            }
+
+            if (strpos($page, '[clientswp_group_add_user_form]') !== FALSE) {
+                return nl2br($page);
+            }
+
             if (strpos($page, '[cwp_') !== FALSE) {
                 $args = array(
                     'meta_key' => '_clients_page_shortcode',
@@ -182,20 +189,13 @@ class Clients_WP_Google{
                             $linked_client_id = get_post_meta($post->ID, '_clients_page_client', true);
                             $client_email = get_post_meta($linked_client_id, '_bt_client_group_owner', true);
 
-                            if(is_user_logged_in()) {
-                                $current_user = wp_get_current_user();
-                                if(!current_user_can('administrator')) {
-                                    if($current_user->user_email != $client_email) {
-                                        echo 'You are not allowed to see this contents.';
-                                        return;
-                                    }
-                                } else {
-                                    if($current_user->user_email != $client_email) {
-                                        echo 'You are not allowed to see this contents.';
-                                        return;
-                                    }
-                                }
-                            } else {
+                            if (!is_user_logged_in()) {
+                                echo 'You are not allowed to see this contents.';
+                                return;
+                            }
+
+                            $user_groups = cwp_get_current_user_groups();
+                            if (empty($user_groups)) {
                                 echo 'You are not allowed to see this contents.';
                                 return;
                             }
@@ -215,15 +215,13 @@ class Clients_WP_Google{
                                 }
                             }
 
-                            ob_start();
                             include_once(CWPG_PATH_INCLUDES . '/cwp-google-table.php');
-                            $page_content .= ob_get_clean();
                         }
                     }
                 }
+            } else {
+                return nl2br($page);
             }
-
-            return $page_content;
         }
     }
 
